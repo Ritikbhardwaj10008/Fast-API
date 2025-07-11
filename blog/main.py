@@ -57,6 +57,41 @@ def show(id,response:Response,db:Session=Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'Blog with the {id} is not  available')
     return blog
 
+@app.delete('/blog/{id}',status_code=status.HTTP_204_NO_CONTENT)
+def destroy(id,db:Session=Depends(get_db)):
+    blog=db.query(models.Blog).filter(models.Blog.id==id)
+    # checking of blog is not available raise the exception
+    if not blog.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'Blog with id {id} not found')
+    blog.delete(synchronize_session=False)
+
+    db.commit()
+
+    return 'done'
+    # how do we delete anything from the sql alchemy
+
+#    ✅ How SQLAlchemy works:
+#    You want to...	           You write
+#    Get all rows	           db.query(Model).all()
+#    Filter rows	           db.query(Model).filter(...).all()
+#    Delete rows	           db.query(Model).filter(...).delete()
+#    Add a new row	           db.add(obj)
+
+
+# now to update the particular thing
+@app.put('/blog/{id}',status_code=status.HTTP_202_ACCEPTED)
+def update(id,request:schemas.Blog,db:Session=Depends(get_db)):
+    # this request is whatever we pass from the browser(swagger)
+    blog=db.query(models.Blog).filter(models.Blog.id==id).update(request)
+    if not blog.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f'Blog with id {id} not found')
+    
+    blog.update(request)
+
+    db.commit()
+    
+    return 'updated'
+
 
 
 
