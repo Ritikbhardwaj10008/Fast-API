@@ -23,3 +23,11 @@ class Blog(Base):  #model this is inherited to base , and then we create the tab
     body: Mapped[str] = mapped_column(Text)
     
  
+class User(Base):
+    __tablename__='user'
+    
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name:Mapped[str]=mapped_column(String(255))
+    email:Mapped[str]=mapped_column(String(255))
+    password:Mapped[str]=mapped_column(String(255))
+

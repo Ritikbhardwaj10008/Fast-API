@@ -3,6 +3,7 @@ from fastapi import FastAPI,Depends,status,Response,HTTPException
 from blog import schemas, models
 from blog.database import engine ,SessionLocal # we write like this bcz the thing we are inprting here is not a function
 from sqlalchemy.orm import Session
+from typing import List
 
 app=FastAPI()
 
@@ -40,7 +41,7 @@ def create(request:schemas.Blog,db:Session=Depends(get_db)):  # request have the
 # we need to store all the request body into the database
 
 # get request to see all the blogs
-@app.get('/blog')
+@app.get('/blog',response_model=List[schemas.ShowBlog])
 def all(db:Session=Depends(get_db)):             # here parameter is the database instance 
     blogs=db.query(models.Blog).all()           # this is how we get all the blogs
     return blogs         
@@ -79,7 +80,7 @@ def destroy(id,db:Session=Depends(get_db)):
 
 
 # now to update the particular thing
-@app.put('/blog/{id}',status_code=status.HTTP_202_ACCEPTED)
+@app.put('/blog/{id}',status_code=status.HTTP_202_ACCEPTED,response_model=schemas.ShowBlog)
 def update(id,request:schemas.Blog,db:Session=Depends(get_db)):
     # this request is whatever we pass from the browser(swagger)
     blog=db.query(models.Blog).filter(models.Blog.id==id).update(request)
@@ -96,5 +97,14 @@ def update(id,request:schemas.Blog,db:Session=Depends(get_db)):
 
 
 
+
+@app.post('/user')
+def create_user(request:schemas.User,db:Session=Depends(get_db)):
+    new_user=models.User(name=request.name,email=request.email,password=request.password)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
 
 # python -m blog.main  run this file like this 
