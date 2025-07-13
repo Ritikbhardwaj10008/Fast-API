@@ -14,3 +14,14 @@ SessionLocal=sessionmaker(bind=engine,autocommit=False,autoflush=False)
 # Declare mapping
 #Base=declarative_base()   # this base is inherited in the models.py 
 # now this way is not required in sqlalchemy2.0
+
+
+
+
+
+def get_db():
+    db=SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
