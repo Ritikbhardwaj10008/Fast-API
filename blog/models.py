@@ -1,6 +1,7 @@
 # pip install sqlalchemy
-from sqlalchemy import Column,Integer,String,Text
+from sqlalchemy import Column,Integer,String,Text,ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import relationship
 #from blog.database import Base  # this base is from the database  (an object of declarative base)
 
 
@@ -21,13 +22,20 @@ class Blog(Base):  #model this is inherited to base , and then we create the tab
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(255))
     body: Mapped[str] = mapped_column(Text)
+    user_id:Mapped[int]=mapped_column(ForeignKey('users.id'))
+
+    
+    creator:Mapped["User"]=relationship("User",back_populates="blogs")
     
  
 class User(Base):
-    __tablename__='user'
-    
+    __tablename__='users'
+
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name:Mapped[str]=mapped_column(String(255))
     email:Mapped[str]=mapped_column(String(255))
     password:Mapped[str]=mapped_column(String(255))
+    
+    
+    blogs:Mapped[list["Blog"]]=relationship("Blog",back_populates="creator")
 
